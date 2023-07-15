@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Covid-19 Dashboard</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <style>
+        #container1, #container2, #container3, #container4, #container5 {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .header {
+    background-color: #f68888;
+    padding: 10px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.footer {
+    background-color: #f68888;
+    padding: 5px;
+    text-align: center;
+    width: 100%;
+    font-size: 12px;
+}
+        .content {
+            margin: auto;
+            width: 80%;
+            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+
+        .image-container {
+            max-width: 100%;
+            margin: auto;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+        }
+
+        #userTable {
+            font-size: 14px;
+            width: 100%;
+        }
+
+        #userTable th,
+        #userTable td {
+            padding: 10px;
+        }
+
+        .content {
+            margin: auto;
+            width: 100%; /* Increase the width of the table container */
+            text-align: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+
+        #userTable {
+            width: 200%; /* Increase the width of the table */
+        }
+        
+    </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Covid-19 Dashboard</h1>
+</div>
+<div class="image-container">
+    <img src="image/im.jpg" alt="Image">
+</div>
+<div class="content">
+    <div id="container1"></div>
+    <div id="container2"></div>
+    <div id="container3"></div>
+    <div id="container4"></div>
+    <div id="container5"></div>
+</div>
+<table id="userTable" class="display">
+    <thead>
+        <tr>
+            <th>Country</th>
+            <th>Confirmed</th>
+            <th>Deaths</th>
+            <th>Active</th>
+            <th>Recovered</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+
+<script>
+    async function one() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/all');
+        const data = await fetched.json();
+
+        Highcharts.chart('container1', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Total Confirmed Cases Worldwide'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            series: [{
+                name: 'Cases',
+                data: [
+                    {name: 'Active', y: data.active},
+                    {name: 'Deaths', y: data.deaths},
+                    {name: 'Recovered', y: data.recovered}
+                ]
+            }]
+        });
+    }
+
+    async function two() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/all');
+        const data = await fetched.json();
+
+        Highcharts.chart('container2', {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'Total Confirmed Cases Worldwide'
+            },
+            xAxis: {
+                categories: ['Cases']
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Cases'
+                }
+            },
+            legend: {
+                reversed: true
+            },
+            plotOptions: {
+                series: {
+                    stacking: 'normal'
+                }
+            },
+            series: [{
+                name: 'Active',
+                data: [data.active]
+            }, {
+                name: 'Recovered',
+                data: [data.recovered]
+            }, {
+                name: 'Deaths',
+                data: [data.deaths]
+            }]
+        });
+    }
+
+    async function three() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/countries?sort=cases');
+        const data = await fetched.json();
+        const topTen = data.slice(0, 10);
+
+        Highcharts.chart('container3', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Top 10 Countries with Most Confirmed Cases'
+            },
+            xAxis: {
+                categories: topTen.map(countryData => countryData.country)
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Cases'
+                }
+            },
+            series: [{
+                name: 'Confirmed Cases',
+                data: topTen.map(countryData => countryData.cases)
+            }]
+        });
+    }
+
+    async function four() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/countries?sort=deaths');
+        const data = await fetched.json();
+        const topTen = data.slice(0, 15);
+
+        Highcharts.chart('container4', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Top 10 Countries with Most Deaths'
+            },
+            xAxis: {
+                categories: topTen.map(countryData => countryData.country)
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Deaths'
+                }
+            },
+            series: [{
+                name: 'Deaths',
+                data: topTen.map(countryData => countryData.deaths)
+            }]
+        });
+    }
+
+    async function five() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/countries?sort=recovered');
+        const data = await fetched.json();
+        const topTen = data.slice(0, 10);
+
+        Highcharts.chart('container5', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Top 10 Countries with Most Recovered Cases'
+            },
+            xAxis: {
+                categories: topTen.map(countryData => countryData.country)
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Number of Recovered Cases'
+                }
+            },
+            series: [{
+                name: 'Recovered Cases',
+                data: topTen.map(countryData => countryData.recovered)
+            }]
+        });
+        
+    }
+
+    async function populateTable() {
+        const fetched = await fetch('https://disease.sh/v3/covid-19/countries');
+        const data = await fetched.json();
+
+        const table = $('#userTable').DataTable({
+            data: data,
+            columns: [
+                { data: 'country' },
+                { data: 'cases' },
+                { data: 'deaths' },
+                { data: 'active' },
+                { data: 'recovered' }
+            ],
+            order: [[ 1, 'desc' ]]
+        });
+    }
+
+    one();
+    two();
+    three();
+    four();
+    five();
+    populateTable();
+</script>
+
+<div class="footer">
+    <p>&copy; 2023 Covid-19 Dashboard</p>
+</div>
+</body>
+</html>
